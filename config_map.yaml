@@ -1,0 +1,50 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  NGINX_CONFIG: |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log notice;
+    pid        /var/run/nginx.pid;
+
+    events {
+        worker_connections  1024;
+    }
+
+    http {
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #gzip  on;
+        server  {
+            location / {
+                root /var/data;
+                index index.html index.php;
+            }
+        }
+    }
+  NGINX_HTML: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h1>Ni Hao!</h1>
+
+    <p>Ni zen'me yang?</p>
+
+    </body>
+    </html>

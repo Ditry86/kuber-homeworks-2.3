@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-multitool
+  labels:
+    app: nginx-multitool
+spec:
+  selector:
+    matchLabels:
+      app: nginx-multitool
+  template:
+    metadata:
+      labels:
+        app: nginx-multitool
+    spec:
+      containers:
+        - name: multitool
+          image: wbitt/network-multitool
+          env:
+          - name: HTTP_PORT
+            value: "1180"
+          - name: HTTPS_PORT
+            value: "11443"
+          ports:
+          - containerPort: 1180
+            name: http-port
+          - containerPort: 11443
+            name: https-port
+          resources:
+            requests:
+              cpu: "1m"
+              memory: "20Mi"
+          securityContext:
+            runAsUser: 0
+            capabilities:
+              add: ["NET_ADMIN"]
+        - name: nginx
+          image: nginx
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-config
+              mountPath: /var/data/index.html
+              subPath: index.html
+      initContainers:
+      - name: init-myservice
+        image: nginx
+        command: ['bash', '-c', 'mkdir -p /var/data']
+        securityContext:
+          runAsUser: 0 
+          runAsGroup: 0
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-conf
+          items:
+            - key: NGINX_CONFIG
+              path: nginx.conf
+            - key: NGINX_HTML
+              path: index.html
+              
