@@ -16,3 +16,7 @@ spec:
             name: nginx-srv
             port:
               number: 8080
+  tls:
+  - hosts:
+      - homework.local
+    secretName: my-secret

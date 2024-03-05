@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+  labels:
+    app: my-nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: nginx-config
+            mountPath: /var/data/index.html
+            subPath: index.html
+      initContainers:
+      - name: init-myservice
+        image: nginx
+        command: ['bash', '-c', 'mkdir -p /var/data']
+        securityContext:
+          runAsUser: 0 
+          runAsGroup: 0
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-conf2
+          items:
+          - key: NGINX_CONFIG
+            path: nginx.conf
+          - key: NGINX_HTML
+            path: index.html
+        
+              
