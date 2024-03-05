@@ -36,13 +36,15 @@ spec:
               add: ["NET_ADMIN"]
         - name: nginx
           image: nginx
+          ports:
+          - containerPort: 80
           volumeMounts:
-            - name: nginx-config
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-            - name: nginx-config
-              mountPath: /var/data/index.html
-              subPath: index.html
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: nginx-config
+            mountPath: /var/data/index.html
+            subPath: index.html
       initContainers:
       - name: init-myservice
         image: nginx
@@ -54,9 +56,11 @@ spec:
       - name: nginx-config
         configMap:
           name: nginx-conf
+          
           items:
-            - key: NGINX_CONFIG
-              path: nginx.conf
-            - key: NGINX_HTML
-              path: index.html
+          - key: NGINX_CONFIG
+            path: nginx.conf
+          - key: NGINX_HTML
+            path: index.html
+        
               
